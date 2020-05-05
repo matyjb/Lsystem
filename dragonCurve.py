@@ -16,4 +16,4 @@ rules = {
   "Y":"-FX-Y"
 }
 n = 10
-show(commands,axiom,rules,n)
+show(commands,axiom,rules,n, msPerLine=5)

@@ -15,4 +15,4 @@ rules = {
   "B":"A+B+A"
 }
 n = 6
-show(commands,axiom,rules,n, start_pos=(700,700), start_rot=-90)
+show(commands,axiom,rules,n, start_pos=(700,700), start_rot=-90, msPerLine=5)

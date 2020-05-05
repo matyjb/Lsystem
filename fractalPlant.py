@@ -16,5 +16,5 @@ rules = {
   "X":"F+[[X]-X]-F[-FX]+X", 
   "F":"FF"
 }
-n = 7
-show(commands,axiom,rules,n, start_pos=(10,800), start_rot=30)
+n = 6
+show(commands,axiom,rules,n, start_pos=(10,800), start_rot=30, msPerLine=2)

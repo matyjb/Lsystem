@@ -13,4 +13,4 @@ rules = {
   "F":"F-F+F+F-F"
 }
 n = 3
-show(commands,axiom,rules,n)
+show(commands,axiom,rules,n, msPerLine=10)

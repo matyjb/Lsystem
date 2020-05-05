@@ -15,4 +15,4 @@ rules = {
   "G":"F[G]G"
 }
 n = 8
-show(commands,axiom,rules,n, start_pos=(400,800))
+show(commands,axiom,rules,n, start_pos=(400,800), msPerLine=5)
