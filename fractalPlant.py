@@ -7,7 +7,6 @@ commands = {
   "F": (CommandType.DRAW_FORWARD,steps),
   "-": (CommandType.ROTATE_LEFT,angle),
   "+": (CommandType.ROTATE_RIGHT,angle),
-  "X": (CommandType.DO_NOTHING,None),
   "[": (CommandType.PUSH,None),
   "]": (CommandType.POP,None)
 }

@@ -7,8 +7,6 @@ commands = {
   "F": (CommandType.DRAW_FORWARD,steps),
   "-": (CommandType.ROTATE_LEFT,angle),
   "+": (CommandType.ROTATE_RIGHT,angle),
-  "X": (CommandType.DO_NOTHING,None),
-  "Y": (CommandType.DO_NOTHING,None)
 }
 axiom = "FX"
 rules = {

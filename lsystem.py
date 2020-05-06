@@ -1,14 +1,15 @@
 from enum import Enum
 import pygame, sys
 
+
 class CommandType:
-  DO_NOTHING = 0
-  MOVE_FORWARD = 1
-  DRAW_FORWARD = 2
-  ROTATE_LEFT = 3
-  ROTATE_RIGHT = 4
-  PUSH = 5
-  POP = 6
+  MOVE_FORWARD = 0
+  DRAW_FORWARD = 1
+  ROTATE_LEFT = 2
+  ROTATE_RIGHT = 3
+  PUSH = 4
+  POP = 5
+
 
 def filter_dict_by_prefix(d, filter_prefix):
     return {key:val for key, val in d.items() if key.startswith(filter_prefix)}
@@ -48,7 +49,10 @@ def getCmdsTodo(commands, string):
     possibleCmd = string[i:j]
     filteredCmds = filter_dict_by_prefix(commands,possibleCmd)
     if len(filteredCmds) == 0:
-      raise Exception("niezrozumiała komenda: " + possibleCmd)
+      # print("niezrozumiała komenda: " + possibleCmd)
+      i = j
+      j += 1
+      continue
     
     if possibleCmd in filteredCmds.keys():
       # spr czy zostaly podane wiele komend jako jedna
@@ -113,8 +117,6 @@ def show(commands, axiom, rules, n=5, res=(800,800), start_pos=(400,400), start_
           (newPos,newRot) = stack.pop()
           position = newPos
           rotation = newRot
-        elif cmd == CommandType.DO_NOTHING:
-          pass
         else:
           print("Nieznana komenda - " + str(cmd))
 
