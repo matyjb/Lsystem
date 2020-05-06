@@ -10,6 +10,13 @@ class TurtleState:
     self.color = color
     self.width = width
 
+  def draw(self,surface):
+    scale = 6
+    p0 = self.position + pygame.math.Vector2.rotate(pygame.Vector2(0,2) * scale, self.rotation)
+    p1 = self.position + pygame.math.Vector2.rotate(pygame.Vector2(1,-1) * scale, self.rotation)
+    p2 = self.position + pygame.math.Vector2.rotate(pygame.Vector2(-1,-1) * scale, self.rotation)
+    pygame.draw.polygon(surface, self.color, (p0, p1, p2))
+    pygame.draw.polygon(surface, (255,0,0), (p0, p1, p2), 1)
 
 class CommandType:
   MOVE_FORWARD = 0
@@ -100,7 +107,7 @@ defaultCommands = {
   "<": (CommandType.DIV_STEPS,None),
 }
 
-def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, n=5, res=(800,800), start_pos=(400,400), start_rot=0, widthOfLine=1, timeToDrawAllMs=0, delay=1000, printString=False):
+def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, n=5, res=(800,800), start_pos=(400,400), start_rot=0, widthOfLine=1, timeToDrawAllMs=0, delay=1000, printString=False, drawTurtle=True):
   # merging defaultCommands and defaultCommands
   commands = {k:v for (k,v) in defaultCommands.items()}
   for (key,val) in customCommands.items():
@@ -116,7 +123,7 @@ def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, 
   window = pygame.display.set_mode(res)
   # init state (position, rotation, stack)
   turtleState = TurtleState(
-    position=start_pos,
+    position=pygame.Vector2(start_pos),
     rotation=start_rot - 180,
     turningAngle = angle,
     stepLength = steps,
@@ -126,6 +133,8 @@ def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, 
   stack = []
 
   lastOperationIndexFloat = 0
+
+  drawingSurface = window.copy()
   while True:
     for event in pygame.event.get():
       if event.type == pygame.QUIT:
@@ -136,12 +145,12 @@ def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, 
             os.makedirs("./screenshots")
           timeTaken = time.asctime(time.localtime(time.time())).replace(" ","_").replace(":","-")
           saveFile = "screenshots/"+timeTaken+".png"
-          pygame.image.save(window,saveFile)
+          pygame.image.save(drawingSurface,saveFile)
           print("Screenshot saved as " + saveFile)
 
 
 
-    # window.fill((0,0,0))
+    # drawingSurface.fill((0,0,0))
     dt = clock.tick()
     delay -= dt
     # print(timeFromStartMs)
@@ -152,7 +161,7 @@ def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, 
         opsThisFrame = len(cmdsTodo)
       else:
         opsThisFrame = float(len(cmdsTodo)) / timeToDrawAllMs * dt
-        
+
       for (cmd, arg) in cmdsTodo[int(lastOperationIndexFloat):int(lastOperationIndexFloat + opsThisFrame)]:
 
         if cmd == CommandType.MOVE_FORWARD:
@@ -165,7 +174,7 @@ def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, 
           if arg == None:
             arg = turtleState.stepLength
           newPosition = pygame.math.Vector2.rotate(pygame.Vector2(0,arg), turtleState.rotation) + turtleState.position
-          pygame.draw.line(window, (255,255,255), turtleState.position, newPosition, turtleState.width)
+          pygame.draw.line(drawingSurface, (255,255,255), turtleState.position, newPosition, turtleState.width)
           turtleState.position = newPosition
           # linesDrawn += 1
 
@@ -245,6 +254,7 @@ def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, 
 
 
     lastOperationIndexFloat += opsThisFrame
-    windowCopy = window.copy()
-    window.blit(windowCopy, (0,0))
+    window.blit(drawingSurface, (0,0))
+    if drawTurtle:
+      turtleState.draw(window)
     pygame.display.flip()
