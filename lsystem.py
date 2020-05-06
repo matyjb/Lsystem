@@ -1,5 +1,14 @@
 from enum import Enum
-import pygame, sys
+import pygame, sys, copy
+
+class TurtleState:
+  def __init__(self,position,rotation,turningAngle,stepLength,color,width):
+    self.position = position
+    self.rotation = rotation
+    self.turningAngle = turningAngle
+    self.stepLength = stepLength
+    self.color = color
+    self.width = width
 
 
 class CommandType:
@@ -9,6 +18,13 @@ class CommandType:
   ROTATE_RIGHT = 3
   PUSH = 4
   POP = 5
+  INC_LINE_WIDTH = 6
+  DEC_LINE_WIDTH = 7
+  DRAW_DOT = 8
+  INC_ANGLE = 9
+  DEC_ANGLE = 10
+  MUL_STEPS = 11
+  DIV_STEPS = 12
 
 
 def filter_dict_by_prefix(d, filter_prefix):
@@ -74,15 +90,25 @@ defaultCommands = {
   "]": (CommandType.POP,None),
   "-": (CommandType.ROTATE_LEFT,None),
   "+": (CommandType.ROTATE_RIGHT,None),
+  "|": (CommandType.ROTATE_LEFT,180),
+  "#": (CommandType.INC_LINE_WIDTH,None),
+  "!": (CommandType.DEC_LINE_WIDTH,None),
+  "@": (CommandType.DRAW_DOT,None),
+  ")": (CommandType.INC_ANGLE,None),
+  "(": (CommandType.DEC_ANGLE,None),
+  ">": (CommandType.MUL_STEPS,None),
+  "<": (CommandType.DIV_STEPS,None),
 }
 
-def show(rules, axiom, customCommands={}, steps=10, angle=90, n=5, res=(800,800), start_pos=(400,400), start_rot=0, widthOfLine=1, msPerLine=0, delay=1000):
+def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, n=5, res=(800,800), start_pos=(400,400), start_rot=0, widthOfLine=1, msPerLine=0, delay=1000, printString=False):
   # merging defaultCommands and defaultCommands
   commands = {k:v for (k,v) in defaultCommands.items()}
   for (key,val) in customCommands.items():
     commands[key] = val
 
   outputString = getFinalString(axiom,rules,n)
+  if printString:
+    print(outputString)
   ##
   clock = pygame.time.Clock()
   window = pygame.display.set_mode(res)
@@ -93,58 +119,111 @@ def show(rules, axiom, customCommands={}, steps=10, angle=90, n=5, res=(800,800)
       if event.type == pygame.QUIT:
         return
 
+    # init state (position, rotation, stack)
+    turtleState = TurtleState(
+      position=start_pos,
+      rotation=start_rot - 180,
+      turningAngle = angle,
+      stepLength = steps,
+      color = (255,255,255),
+      width = widthOfLine
+    )
+    stack = []
+
     window.fill((0,0,0))
     timeFromStartMs += clock.tick()
     # print(timeFromStartMs)
 
-    # init state (position, rotation, stack)
-    position = pygame.Vector2(start_pos)
-    rotation = start_rot - 180
-    stack = []
     if delay <= timeFromStartMs:
-      linesDrawn = 0
+      linesDrawn = 0 # used for animation
       for (cmd, arg) in getCmdsTodo(commands,outputString):
         if linesDrawn * msPerLine >= timeFromStartMs-delay:
           break
 
         if cmd == CommandType.MOVE_FORWARD:
           if arg == None:
-            arg = steps
-          newPosition = pygame.math.Vector2.rotate(pygame.Vector2(0,arg), rotation) + position
-          position = newPosition
+            arg = turtleState.stepLength
+          newPosition = pygame.math.Vector2.rotate(pygame.Vector2(0,arg), turtleState.rotation) + turtleState.position
+          turtleState.position = newPosition
 
         elif cmd == CommandType.DRAW_FORWARD:
           if arg == None:
-            arg = steps
-          newPosition = pygame.math.Vector2.rotate(pygame.Vector2(0,arg), rotation) + position
-          pygame.draw.line(window, (255,255,255), position, newPosition, widthOfLine)
-          position = newPosition
+            arg = turtleState.stepLength
+          newPosition = pygame.math.Vector2.rotate(pygame.Vector2(0,arg), turtleState.rotation) + turtleState.position
+          pygame.draw.line(window, (255,255,255), turtleState.position, newPosition, turtleState.width)
+          turtleState.position = newPosition
           linesDrawn += 1
 
         elif cmd == CommandType.ROTATE_LEFT:
           if arg == None:
-            arg = angle
-          rotation += arg
-          if rotation > 180:
-            rotation -= 360
+            arg = turtleState.turningAngle
+          turtleState.rotation += arg
+          if turtleState.rotation > 180:
+            turtleState.rotation -= 360
 
         elif cmd == CommandType.ROTATE_RIGHT:
           if arg == None:
-            arg = angle
-          rotation -= arg
-          if rotation < -180:
-            rotation += 360
+            arg = turtleState.turningAngle
+          turtleState.rotation -= arg
+          if turtleState.rotation < -180:
+            turtleState.rotation += 360
 
         elif cmd == CommandType.PUSH:
           if arg == None:
-            stack.append((position,rotation))
+            stack.append(copy.copy(turtleState))
           else:
             stack.append(arg)
 
         elif cmd == CommandType.POP:
-          (newPos,newRot) = stack.pop()
-          position = newPos
-          rotation = newRot
+          turtleState = stack.pop()
+
+        elif cmd == CommandType.INC_LINE_WIDTH:
+          if arg == None:
+            turtleState.width += 1
+          else:
+            turtleState.width += arg
+
+        elif cmd == CommandType.DEC_LINE_WIDTH:
+          if arg == None:
+            turtleState.width -= 1
+          else:
+            turtleState.width -= arg
+            
+          if turtleState.width <= 0:
+            turtleState.width = 1
+
+        elif cmd == CommandType.DRAW_DOT:
+          if arg == None:
+            pygame.draw.circle(screen, (255,255,255), turtleState.position, turtleState.width)
+          else:
+            pygame.draw.circle(screen, (255,255,255), turtleState.position, arg)
+
+        elif cmd == CommandType.INC_ANGLE:
+          if arg == None:
+            turtleState.turningAngle += 1
+          else:
+            turtleState.turningAngle += arg
+
+        elif cmd == CommandType.DEC_ANGLE:
+          if arg == None:
+            turtleState.turningAngle -= 1
+          else:
+            turtleState.turningAngle -= arg
+
+          if turtleState.turningAngle <= 0:
+            turtleState.turningAngle = 1
+
+        elif cmd == CommandType.MUL_STEPS:
+          if arg == None:
+            turtleState.stepLength *= stepsMulFactor
+          else:
+            turtleState.stepLength *= arg
+
+        elif cmd == CommandType.DIV_STEPS:
+          if arg == None:
+            turtleState.stepLength /= float(stepsMulFactor)
+          else:
+            turtleState.stepLength /= float(arg)
 
         else:
           print("Nieznana komenda - " + str(cmd))

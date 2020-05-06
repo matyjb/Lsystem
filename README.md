@@ -18,6 +18,13 @@
 '-' - rotate left by angle
 '[' - push state (position, rotation)
 ']' - pop state (position, rotation)
+'#' - increment line width
+'!' - decrement line width (line width >= 1)
+'@' - draw a filled circle with line width as radius
+'(' - decrement angle by one
+')' - increment angle by one
+'>' - multiply steps by steps multiply factor
+'<' - divide steps by steps multiply factor
 
 It is possible to pass custom commands in format of dictionary of
 `<stringToIndicateCmd>: (<CommandType>,<argument>)`
