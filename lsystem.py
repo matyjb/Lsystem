@@ -67,9 +67,21 @@ def getCmdsTodo(commands, string):
     else:
       j += 1
 
-  # return result  
+defaultCommands = {
+  "F": (CommandType.DRAW_FORWARD,None),
+  "f": (CommandType.MOVE_FORWARD,None),
+  "[": (CommandType.PUSH,None),
+  "]": (CommandType.POP,None),
+  "-": (CommandType.ROTATE_LEFT,None),
+  "+": (CommandType.ROTATE_RIGHT,None),
+}
 
-def show(commands, axiom, rules, n=5, res=(800,800), start_pos=(400,400), start_rot=0, widthOfLine=1, msPerLine=0, delay=1000):
+def show(rules, axiom, customCommands={}, steps=10, angle=90, n=5, res=(800,800), start_pos=(400,400), start_rot=0, widthOfLine=1, msPerLine=0, delay=1000):
+  # merging defaultCommands and defaultCommands
+  commands = {k:v for (k,v) in defaultCommands.items()}
+  for (key,val) in customCommands.items():
+    commands[key] = val
+
   outputString = getFinalString(axiom,rules,n)
   ##
   clock = pygame.time.Clock()
@@ -96,27 +108,44 @@ def show(commands, axiom, rules, n=5, res=(800,800), start_pos=(400,400), start_
           break
 
         if cmd == CommandType.MOVE_FORWARD:
+          if arg == None:
+            arg = steps
           newPosition = pygame.math.Vector2.rotate(pygame.Vector2(0,arg), rotation) + position
           position = newPosition
+
         elif cmd == CommandType.DRAW_FORWARD:
+          if arg == None:
+            arg = steps
           newPosition = pygame.math.Vector2.rotate(pygame.Vector2(0,arg), rotation) + position
           pygame.draw.line(window, (255,255,255), position, newPosition, widthOfLine)
           position = newPosition
           linesDrawn += 1
+
         elif cmd == CommandType.ROTATE_LEFT:
+          if arg == None:
+            arg = angle
           rotation += arg
           if rotation > 180:
             rotation -= 360
+
         elif cmd == CommandType.ROTATE_RIGHT:
+          if arg == None:
+            arg = angle
           rotation -= arg
           if rotation < -180:
             rotation += 360
+
         elif cmd == CommandType.PUSH:
-          stack.append((position,rotation))
+          if arg == None:
+            stack.append((position,rotation))
+          else:
+            stack.append(arg)
+
         elif cmd == CommandType.POP:
           (newPos,newRot) = stack.pop()
           position = newPos
           rotation = newRot
+
         else:
           print("Nieznana komenda - " + str(cmd))
 

@@ -1,18 +1,19 @@
 from lsystem import *
 
-steps = 10
-angle = 120
-
 commands = {
-  "F": (CommandType.DRAW_FORWARD,steps),
-  "G": (CommandType.DRAW_FORWARD,steps),
-  "-": (CommandType.ROTATE_LEFT,angle),
-  "+": (CommandType.ROTATE_RIGHT,angle)
+  "G": (CommandType.DRAW_FORWARD,None),
 }
 axiom = "F+G+G"
 rules = {
   "F":"F+G-F-G+F", 
   "G":"GG"
 }
-n = 5
-show(commands,axiom,rules,n, msPerLine=5)
+show(
+  rules,
+  axiom,
+  customCommands=commands,
+  steps=10,
+  angle=120,
+  n=5,
+  msPerLine=5
+  )
