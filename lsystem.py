@@ -35,7 +35,7 @@ def getFinalString(substring,rules,n):
   if n <= 0:
     return substring
 
-  outputString = ""
+  outputString = []
   i=0
   while i < len(substring):
     didApplyRule = False
@@ -43,13 +43,13 @@ def getFinalString(substring,rules,n):
       if substring[i:].startswith(key):
         i += len(key)
         didApplyRule = True
-        outputString += getFinalString(val,rules,n-1)
+        outputString.append(getFinalString(val,rules,n-1))
       
     if not didApplyRule:
-      outputString += substring[i]
+      outputString.append(substring[i])
       i += 1
 
-  return outputString
+  return ''.join(outputString)
 
 
 def getCmdsTodo(commands, string):
@@ -107,6 +107,7 @@ def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, 
     commands[key] = val
 
   outputString = getFinalString(axiom,rules,n)
+  print("String size: ",len(outputString))
   if printString:
     print(outputString)
   ##

@@ -1,4 +1,5 @@
 from cantorSet import *
+from crystal import *
 from dragonCurve import *
 from fractalPlant import *
 from fractalTree import *
