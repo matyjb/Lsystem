@@ -1,6 +1,6 @@
 from lsystem import *
 
-steps = 10
+steps = 5
 angle = 90
 
 commands = {
@@ -15,5 +15,5 @@ rules = {
   "X":"X+YF+", 
   "Y":"-FX-Y"
 }
-n = 10
-show(commands,axiom,rules,n, msPerLine=5)
+n = 12
+show(commands,axiom,rules,n, msPerLine=2)

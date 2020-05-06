@@ -65,7 +65,7 @@ def getCmdsTodo(commands, string):
 
   # return result  
 
-def show(commands, axiom, rules, n=5, res=(800,800), start_pos=(400,400), start_rot=0, widthOfLine=1, msPerLine=0, delay=0):
+def show(commands, axiom, rules, n=5, res=(800,800), start_pos=(400,400), start_rot=0, widthOfLine=1, msPerLine=0, delay=1000):
   outputString = getFinalString(axiom,rules,n)
   ##
   clock = pygame.time.Clock()
