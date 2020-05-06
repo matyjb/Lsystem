@@ -15,6 +15,6 @@ show(
   angle=45,
   start_pos=(400,800),
   n=14,
-  opPerSec=2000,
-  stepsMulFactor=1.36
+  stepsMulFactor=1.36,
+  timeToDrawAllMs=1000
   )

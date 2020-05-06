@@ -17,5 +17,5 @@ show(
   n=6,
   start_pos=(700,700),
   start_rot=-90,
-  opPerSec=2000
+  timeToDrawAllMs=1000
   )

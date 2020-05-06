@@ -12,5 +12,6 @@ show(
   n=6,
   start_pos=(0,400),
   start_rot=90,
-  widthOfLine=3
+  widthOfLine=3,
+  timeToDrawAllMs=1000
   )

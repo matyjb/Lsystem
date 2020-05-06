@@ -100,7 +100,7 @@ defaultCommands = {
   "<": (CommandType.DIV_STEPS,None),
 }
 
-def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, n=5, res=(800,800), start_pos=(400,400), start_rot=0, widthOfLine=1, opPerSec=0, delay=1000, printString=False):
+def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, n=5, res=(800,800), start_pos=(400,400), start_rot=0, widthOfLine=1, timeToDrawAllMs=0, delay=1000, printString=False):
   # merging defaultCommands and defaultCommands
   commands = {k:v for (k,v) in defaultCommands.items()}
   for (key,val) in customCommands.items():
@@ -125,8 +125,7 @@ def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, 
   )
   stack = []
 
-  timeFromStartMs = 0
-  lastOperation = 0
+  lastOperationIndexFloat = 0
   while True:
     for event in pygame.event.get():
       if event.type == pygame.QUIT:
@@ -144,20 +143,13 @@ def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, 
 
     # window.fill((0,0,0))
     dt = clock.tick()
-    timeFromStartMs += dt
-
-
+    delay -= dt
     # print(timeFromStartMs)
+
     opsThisFrame = 0
-    if delay <= timeFromStartMs:
-      if opPerSec == 0:
-        opsThisFrame = len(cmdsTodo)
-      else:
-        opsThisFrame = int(opPerSec * dt / 1000.0)
-      # linesDrawn = 0 # used for animation
-      for (cmd, arg) in cmdsTodo[lastOperation:lastOperation + opsThisFrame]:
-        # if linesDrawn * msPerLine >= timeFromStartMs-delay:
-        #   break
+    if delay <= 0:
+      opsThisFrame = float(len(cmdsTodo)) / timeToDrawAllMs * dt
+      for (cmd, arg) in cmdsTodo[int(lastOperationIndexFloat):int(lastOperationIndexFloat + opsThisFrame)]:
 
         if cmd == CommandType.MOVE_FORWARD:
           if arg == None:
@@ -248,7 +240,7 @@ def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, 
           print("Nieznana komenda - " + str(cmd))
 
 
-    lastOperation += opsThisFrame
+    lastOperationIndexFloat += opsThisFrame
     windowCopy = window.copy()
     window.blit(windowCopy, (0,0))
     pygame.display.flip()

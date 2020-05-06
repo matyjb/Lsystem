@@ -15,5 +15,5 @@ show(
   steps=10,
   angle=120,
   n=5,
-  opPerSec=2000
+  timeToDrawAllMs=1000
   )

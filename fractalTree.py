@@ -18,5 +18,5 @@ show(
   customCommands=commands,
   n=8,
   start_pos=(400,800),
-  opPerSec=2000
+  timeToDrawAllMs=1000
   )
