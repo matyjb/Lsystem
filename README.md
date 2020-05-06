@@ -31,3 +31,8 @@ It is possible to pass custom commands in format of dictionary of
 or
 `<stringToIndicateCmd>: [(<CommandType>,<argument>),(<CommandType>,<argument>)]`
 If argument passed is None but it needs one then given command will take appropriately one of steps or angle as arguments
+
+---------------------------------
+
+You can take screenshots with F1 key
+Screenshots are saved to screenshots folder in working directory

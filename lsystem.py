@@ -1,5 +1,5 @@
 from enum import Enum
-import pygame, sys, copy
+import pygame, sys, copy, time, os
 
 class TurtleState:
   def __init__(self,position,rotation,turningAngle,stepLength,color,width):
@@ -118,6 +118,15 @@ def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, 
     for event in pygame.event.get():
       if event.type == pygame.QUIT:
         return
+      if event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_F1:
+          if not os.path.exists("./screenshots"):
+            os.makedirs("./screenshots")
+          timeTaken = time.asctime(time.localtime(time.time())).replace(" ","_").replace(":","-")
+          saveFile = "screenshots/"+timeTaken+".png"
+          pygame.image.save(window,saveFile)
+          print("Screenshot saved as " + saveFile)
+
 
     # init state (position, rotation, stack)
     turtleState = TurtleState(
