@@ -12,5 +12,5 @@ show(
   angle=90,
   n=6,
   start_pos=(0,799),
-  msPerLine=2
+  opPerSec=2000
   )

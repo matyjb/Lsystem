@@ -11,5 +11,5 @@ show(
   steps=5,
   angle=90,
   n=12,
-  msPerLine=2
+  opPerSec=2000
   )

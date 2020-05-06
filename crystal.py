@@ -10,6 +10,6 @@ show(
   steps=5,
   angle=90,
   n=4,
-  msPerLine=2,
+  opPerSec=2000,
   start_pos=(0,799)
   )

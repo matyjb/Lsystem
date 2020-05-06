@@ -100,7 +100,7 @@ defaultCommands = {
   "<": (CommandType.DIV_STEPS,None),
 }
 
-def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, n=5, res=(800,800), start_pos=(400,400), start_rot=0, widthOfLine=1, msPerLine=0, delay=1000, printString=False):
+def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, n=5, res=(800,800), start_pos=(400,400), start_rot=0, widthOfLine=1, opPerSec=0, delay=1000, printString=False):
   # merging defaultCommands and defaultCommands
   commands = {k:v for (k,v) in defaultCommands.items()}
   for (key,val) in customCommands.items():
@@ -111,10 +111,22 @@ def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, 
   if printString:
     print(outputString)
   ##
+  cmdsTodo = [i for i in getCmdsTodo(commands,outputString)]
   clock = pygame.time.Clock()
   window = pygame.display.set_mode(res)
+  # init state (position, rotation, stack)
+  turtleState = TurtleState(
+    position=start_pos,
+    rotation=start_rot - 180,
+    turningAngle = angle,
+    stepLength = steps,
+    color = (255,255,255),
+    width = widthOfLine
+  )
+  stack = []
 
   timeFromStartMs = 0
+  lastOperation = 0
   while True:
     for event in pygame.event.get():
       if event.type == pygame.QUIT:
@@ -129,26 +141,23 @@ def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, 
           print("Screenshot saved as " + saveFile)
 
 
-    # init state (position, rotation, stack)
-    turtleState = TurtleState(
-      position=start_pos,
-      rotation=start_rot - 180,
-      turningAngle = angle,
-      stepLength = steps,
-      color = (255,255,255),
-      width = widthOfLine
-    )
-    stack = []
 
-    window.fill((0,0,0))
-    timeFromStartMs += clock.tick()
+    # window.fill((0,0,0))
+    dt = clock.tick()
+    timeFromStartMs += dt
+
+
     # print(timeFromStartMs)
-
+    opsThisFrame = 0
     if delay <= timeFromStartMs:
-      linesDrawn = 0 # used for animation
-      for (cmd, arg) in getCmdsTodo(commands,outputString):
-        if linesDrawn * msPerLine >= timeFromStartMs-delay:
-          break
+      if opPerSec == 0:
+        opsThisFrame = len(cmdsTodo)
+      else:
+        opsThisFrame = int(opPerSec * dt / 1000.0)
+      # linesDrawn = 0 # used for animation
+      for (cmd, arg) in cmdsTodo[lastOperation:lastOperation + opsThisFrame]:
+        # if linesDrawn * msPerLine >= timeFromStartMs-delay:
+        #   break
 
         if cmd == CommandType.MOVE_FORWARD:
           if arg == None:
@@ -162,7 +171,7 @@ def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, 
           newPosition = pygame.math.Vector2.rotate(pygame.Vector2(0,arg), turtleState.rotation) + turtleState.position
           pygame.draw.line(window, (255,255,255), turtleState.position, newPosition, turtleState.width)
           turtleState.position = newPosition
-          linesDrawn += 1
+          # linesDrawn += 1
 
         elif cmd == CommandType.ROTATE_LEFT:
           if arg == None:
@@ -239,5 +248,7 @@ def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, 
           print("Nieznana komenda - " + str(cmd))
 
 
-
+    lastOperation += opsThisFrame
+    windowCopy = window.copy()
+    window.blit(windowCopy, (0,0))
     pygame.display.flip()

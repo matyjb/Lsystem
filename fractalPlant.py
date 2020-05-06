@@ -10,8 +10,8 @@ show(
   axiom,
   steps=2,
   angle=25,
-  n=6,
+  n=7,
   start_pos=(10,800),
   start_rot=30,
-  msPerLine=2
+  opPerSec=25000
   )

@@ -18,5 +18,5 @@ show(
   customCommands=commands,
   n=8,
   start_pos=(400,800),
-  msPerLine=5
+  opPerSec=2000
   )

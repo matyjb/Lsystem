@@ -17,5 +17,5 @@ show(
   n=6,
   start_pos=(700,700),
   start_rot=-90,
-  msPerLine=5
+  opPerSec=2000
   )
