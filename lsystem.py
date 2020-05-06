@@ -148,7 +148,11 @@ def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, 
 
     opsThisFrame = 0
     if delay <= 0:
-      opsThisFrame = float(len(cmdsTodo)) / timeToDrawAllMs * dt
+      if timeToDrawAllMs == 0:
+        opsThisFrame = len(cmdsTodo)
+      else:
+        opsThisFrame = float(len(cmdsTodo)) / timeToDrawAllMs * dt
+        
       for (cmd, arg) in cmdsTodo[int(lastOperationIndexFloat):int(lastOperationIndexFloat + opsThisFrame)]:
 
         if cmd == CommandType.MOVE_FORWARD:
