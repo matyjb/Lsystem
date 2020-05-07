@@ -1,5 +1,6 @@
 from enum import Enum
 import pygame, sys, copy, time, os
+pygame.init()
 
 class TurtleState:
   def __init__(self,position,rotation,turningAngle,stepLength,color,width):
@@ -134,6 +135,8 @@ def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, 
 
   lastOperationIndexFloat = 0
 
+  font = pygame.font.SysFont(pygame.font.get_default_font(), 24)
+
   drawingSurface = window.copy()
   while True:
     for event in pygame.event.get():
@@ -252,9 +255,15 @@ def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, 
         else:
           print("Nieznana komenda - " + str(cmd))
 
+    if lastOperationIndexFloat < len(cmdsTodo):
+      lastOperationIndexFloat += opsThisFrame
+    else:
+      lastOperationIndexFloat = len(cmdsTodo)
 
-    lastOperationIndexFloat += opsThisFrame
     window.blit(drawingSurface, (0,0))
+
+    opsOutOfAll = font.render(str(int(lastOperationIndexFloat))+" / "+str(len(cmdsTodo)), True, (255,255,255))
+    window.blit(opsOutOfAll, (0, 0))
     if drawTurtle:
       turtleState.draw(window)
     pygame.display.flip()

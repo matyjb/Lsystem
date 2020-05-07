@@ -13,5 +13,5 @@ show(
   n=7,
   start_pos=(10,800),
   start_rot=30,
-  timeToDrawAllMs=1000
+  timeToDrawAllMs=50000
   )
