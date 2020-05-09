@@ -1,4 +1,9 @@
-from lsystem import *
+from TurtleWindow import TurtleWindow
+from CommandType import CommandType
+
+t = TurtleWindow()
+t.turtle.stepLength=10
+t.turtle.turningAngle=120
 
 commands = {
   "G": (CommandType.DRAW_FORWARD,None),
@@ -8,12 +13,10 @@ rules = {
   "F":"F+G-F-G+F", 
   "G":"GG"
 }
-show(
-  rules,
+t.show(
   axiom,
+  rules,
   customCommands=commands,
-  steps=10,
-  angle=120,
   n=5,
   timeToDrawAllMs=1000
   )

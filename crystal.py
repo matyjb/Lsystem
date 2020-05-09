@@ -1,15 +1,17 @@
-from lsystem import *
+from TurtleWindow import TurtleWindow
+from CommandType import CommandType
+
+t = TurtleWindow()
+t.turtle.stepLength=5
+t.turtle.turningAngle=90
 
 axiom = "F-F-F-F"
 rules = {
   "F":"FF-F--F-F", 
 }
-show(
-  rules,
+t.show(
   axiom,
-  steps=5,
-  angle=90,
+  rules,
   n=4,
-  start_pos=(0,799),
   timeToDrawAllMs=1000
   )

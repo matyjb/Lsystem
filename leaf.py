@@ -1,4 +1,10 @@
-from lsystem import *
+from TurtleWindow import TurtleWindow
+from CommandType import CommandType
+
+t = TurtleWindow()
+t.turtle.stepLength=2
+t.turtle.turningAngle=45
+t.turtle.mulStep=1.36
 
 axiom = "a"
 rules = {
@@ -8,13 +14,9 @@ rules = {
   "x": "a",
   "y": "b",
 }
-show(
-  rules,
+t.show(
   axiom,
-  steps=2,
-  angle=45,
-  start_pos=(400,800),
+  rules,
   n=14,
-  stepsMulFactor=1.36,
   timeToDrawAllMs=1000
   )
