@@ -29,19 +29,23 @@ keys = {}
 
 class TurtleWindow:
   def __init__(self,defaultTurtleState=None,res=(800,800)):
+    turtleState=Turtle(pygame.Vector2(0,0),180,10,10,1,1,(255,255,255),1)
     if defaultTurtleState==None:
-      turtleState=Turtle(pygame.Vector2(0,0),180,10,10,1,1,(255,255,255),1)
-      self.defaultTurtleState = turtleState
       self.turtle = copy.copy(turtleState)
     else:
-      self.defaultTurtleState = defaultTurtleState
       self.turtle = copy.copy(defaultTurtleState)
+    self.defaultTurtleState = turtleState
 
     self.window = pygame.display.set_mode(res)
     self.uiSurface = None
     self.drawingSurface = None
     self.stack = []
     self.isRunning = False
+    self.isAnimStopped = False
+    self.executeNext = False
+
+    # index of what command was last executed in each frame
+    self.nextOperationIndexFloat = 0
 
     self.camPos = pygame.Vector2(0,0)
 
@@ -154,12 +158,22 @@ class TurtleWindow:
       if event.type == pygame.QUIT:
         self.isRunning = False
       if event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_ESCAPE:
+          self.isRunning = False
         if event.key == pygame.K_F1:
           self.exportDrawingSurfaceToFile()
-        if  event.key in [pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d]:
+        if  event.key in [pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d, pygame.K_t]:
           keys[event.key] = event
+        if event.key == pygame.K_SPACE:
+          self.isAnimStopped = not self.isAnimStopped
+        if event.key == pygame.K_r:
+          self.resetTurtleState()
+          self.nextOperationIndexFloat = 0
+          self.drawingSurface.fill((0,0,0,0))
+
+      
       if event.type == pygame.KEYUP:
-        if  event.key in [pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d]:
+        if  event.key in [pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d, pygame.K_t]:
           del keys[event.key]
     
     if pygame.K_w in keys:
@@ -170,6 +184,8 @@ class TurtleWindow:
       self.camPos += pygame.Vector2(-1,0) * dt / 2.0
     if pygame.K_d in keys:
       self.camPos += pygame.Vector2(1,0) * dt / 2.0
+    if pygame.K_t in keys:
+      self.executeNext = True
 
   def show(self,axiom="",rules={},customCommands={},n=0, timeToDrawAllMs=0, delay=1000, printString=False, drawTurtle=True):
     ##get final commands list
@@ -215,15 +231,14 @@ class TurtleWindow:
     clock = pygame.time.Clock()
     font = pygame.font.SysFont(pygame.font.get_default_font(), FONT_SIZE)
 
-    # index of what command was last executed in each frame
-    nextOperationIndexFloat = 0
-
     fromStart = 0 #how many ms elapsed from start
     ### MAIN LOOP
     self.isRunning = True
+    self.defaultTurtleState = copy.copy(self.turtle)
     while self.isRunning:
       # CLEAR----------------------------------
       self.window.fill((0,0,0))
+      self.uiSurface.fill((0,0,0,0))
       # TICKING--------------------------------
       dt = clock.tick()
       fromStart += dt
@@ -237,21 +252,28 @@ class TurtleWindow:
         else:
           opsThisFrame = float(len(cmdsTodo)) / timeToDrawAllMs * dt
 
+        if self.isAnimStopped:
+          opsThisFrame = 0
+
+        if self.executeNext:
+          opsThisFrame += 1
+          self.executeNext = False
+
         ## EXECUTE COMMANDS in this frame
-        for (cmd, arg) in cmdsTodo[int(nextOperationIndexFloat):int(nextOperationIndexFloat + opsThisFrame)]:
+        for (cmd, arg) in cmdsTodo[int(self.nextOperationIndexFloat):int(self.nextOperationIndexFloat + opsThisFrame)]:
           self.executeCommand(cmd,arg)
 
         ## progress in operations
-        nextOperationIndexFloat += opsThisFrame
-        if nextOperationIndexFloat >= len(cmdsTodo):
-          nextOperationIndexFloat = len(cmdsTodo)
+        self.nextOperationIndexFloat += opsThisFrame
+        if self.nextOperationIndexFloat >= len(cmdsTodo):
+          self.nextOperationIndexFloat = len(cmdsTodo)
       
       # DRAWING--------------------------------
       # draw drawing surface on screen
       self.window.blit(self.drawingSurface, DRAWING_SURFACE_OFFSET+self.camPos)
 
       # generate progress text on screen
-      opsOutOfAll = font.render(str(int(nextOperationIndexFloat))+" / "+str(len(cmdsTodo)), True, (255,255,255))
+      opsOutOfAll = font.render(str(int(self.nextOperationIndexFloat))+" / "+str(len(cmdsTodo)), True, (255,255,255))
       self.uiSurface.blit(opsOutOfAll, (0, 0))
 
       # draw turle on screen too?
