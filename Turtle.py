@@ -32,10 +32,10 @@ class Turtle:
     if self.rotation < -180:
       self.rotation += 360
 
-  def draw(self,surface):
+  def draw(self,surface,offset=Vector2(0,0)):
     scale = 6
-    p0 = self.position + math.Vector2.rotate(Vector2(0,2) * scale, self.rotation)
-    p1 = self.position + math.Vector2.rotate(Vector2(1,-1) * scale, self.rotation)
-    p2 = self.position + math.Vector2.rotate(Vector2(-1,-1) * scale, self.rotation)
+    p0 = self.position + math.Vector2.rotate(Vector2(0,2) * scale, self.rotation) + offset
+    p1 = self.position + math.Vector2.rotate(Vector2(1,-1) * scale, self.rotation) + offset
+    p2 = self.position + math.Vector2.rotate(Vector2(-1,-1) * scale, self.rotation) + offset
     draw.polygon(surface, self.color, (p0, p1, p2))
     draw.polygon(surface, (255,0,0), (p0, p1, p2), 1)

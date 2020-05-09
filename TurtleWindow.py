@@ -25,6 +25,8 @@ defaultCommands = {
   "<": (CommandType.DIV_STEPS,None),
 }
 
+keys = {}
+
 class TurtleWindow:
   def __init__(self,defaultTurtleState=None,res=(800,800)):
     if defaultTurtleState==None:
@@ -36,12 +38,16 @@ class TurtleWindow:
       self.turtle = copy.copy(defaultTurtleState)
 
     self.window = pygame.display.set_mode(res)
+    self.uiSurface = None
     self.drawingSurface = None
     self.stack = []
     self.isRunning = False
 
-  def setRes(self,res=(800,800)):
-    self.window = pygame.display.set_mode(res)
+    self.camPos = pygame.Vector2(0,0)
+
+  def initUISurface(self,res=(800,800)):
+    self.uiSurface = pygame.display.set_mode(res, pygame.SRCALPHA)
+    self.uiSurface.fill((0,0,0,0))
 
   def initDrawingSurface(self,res=(800,800)):
     self.drawingSurface = pygame.Surface(res, pygame.SRCALPHA)
@@ -143,14 +149,27 @@ class TurtleWindow:
     pygame.image.save(self.drawingSurface,saveFile)
     print("Screenshot saved as " + saveFile)
 
-  def handleEvents(self):
+  def handleEvents(self,dt):
     for event in pygame.event.get():
       if event.type == pygame.QUIT:
         self.isRunning = False
       if event.type == pygame.KEYDOWN:
         if event.key == pygame.K_F1:
           self.exportDrawingSurfaceToFile()
-
+        if  event.key in [pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d]:
+          keys[event.key] = event
+      if event.type == pygame.KEYUP:
+        if  event.key in [pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d]:
+          del keys[event.key]
+    
+    if pygame.K_w in keys:
+      self.camPos += pygame.Vector2(0,-1) * dt / 2.0
+    if pygame.K_s in keys:
+      self.camPos += pygame.Vector2(0,1) * dt / 2.0
+    if pygame.K_a in keys:
+      self.camPos += pygame.Vector2(-1,0) * dt / 2.0
+    if pygame.K_d in keys:
+      self.camPos += pygame.Vector2(1,0) * dt / 2.0
 
   def show(self,axiom="",rules={},customCommands={},n=0, timeToDrawAllMs=0, delay=1000, printString=False, drawTurtle=True):
     ##get final commands list
@@ -166,7 +185,7 @@ class TurtleWindow:
     cmdsTodo = translateStringToCmds(commands,outputString)
 
     ## init pygame stuff
-    self.setRes()
+    self.initUISurface()
     # calculate resolution for drawing based on cmdsTodo (progress turtle and check its position)
     self.pushState()
     maxX = minX = self.turtle.position.x
@@ -205,11 +224,11 @@ class TurtleWindow:
     while self.isRunning:
       # CLEAR----------------------------------
       self.window.fill((0,0,0))
-      # EVENTS---------------------------------
-      self.handleEvents()
       # TICKING--------------------------------
       dt = clock.tick()
       fromStart += dt
+      # EVENTS---------------------------------
+      self.handleEvents(dt)
 
       # UPDATE---------------------------------
       if delay < fromStart:
@@ -229,19 +248,20 @@ class TurtleWindow:
       
       # DRAWING--------------------------------
       # draw drawing surface on screen
-      self.window.blit(self.drawingSurface, DRAWING_SURFACE_OFFSET)
+      self.window.blit(self.drawingSurface, DRAWING_SURFACE_OFFSET+self.camPos)
 
       # generate progress text on screen
       opsOutOfAll = font.render(str(int(nextOperationIndexFloat))+" / "+str(len(cmdsTodo)), True, (255,255,255))
-      self.window.blit(opsOutOfAll, (0, 0))
+      self.uiSurface.blit(opsOutOfAll, (0, 0))
 
       # draw turle on screen too?
       if drawTurtle:
         # align with drawingSurface, draw, back to original position
         self.turtle.position += DRAWING_SURFACE_OFFSET
-        self.turtle.draw(self.window)
+        self.turtle.draw(self.uiSurface, self.camPos)
         self.turtle.position -= DRAWING_SURFACE_OFFSET
-      
+
+      self.window.blit(self.uiSurface, (0,0))
       pygame.display.flip()
 
 
