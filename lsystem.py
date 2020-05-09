@@ -1,39 +1,7 @@
-from enum import Enum
 import pygame, sys, copy, time, os
+from CommandType import CommandType
+from Turtle import Turtle
 pygame.init()
-
-class TurtleState:
-  def __init__(self,position,rotation,turningAngle,stepLength,color,width):
-    self.position = position
-    self.rotation = rotation
-    self.turningAngle = turningAngle
-    self.stepLength = stepLength
-    self.color = color
-    self.width = width
-
-  def draw(self,surface):
-    scale = 6
-    p0 = self.position + pygame.math.Vector2.rotate(pygame.Vector2(0,2) * scale, self.rotation)
-    p1 = self.position + pygame.math.Vector2.rotate(pygame.Vector2(1,-1) * scale, self.rotation)
-    p2 = self.position + pygame.math.Vector2.rotate(pygame.Vector2(-1,-1) * scale, self.rotation)
-    pygame.draw.polygon(surface, self.color, (p0, p1, p2))
-    pygame.draw.polygon(surface, (255,0,0), (p0, p1, p2), 1)
-
-class CommandType:
-  MOVE_FORWARD = 0
-  DRAW_FORWARD = 1
-  ROTATE_LEFT = 2
-  ROTATE_RIGHT = 3
-  PUSH = 4
-  POP = 5
-  INC_LINE_WIDTH = 6
-  DEC_LINE_WIDTH = 7
-  DRAW_DOT = 8
-  INC_ANGLE = 9
-  DEC_ANGLE = 10
-  MUL_STEPS = 11
-  DIV_STEPS = 12
-
 
 def filter_dict_by_prefix(d, filter_prefix):
     return {key:val for key, val in d.items() if key.startswith(filter_prefix)}
@@ -134,7 +102,7 @@ def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, 
   font = pygame.font.SysFont(pygame.font.get_default_font(), 20)
 
   # init turtle state (position, rotation etc and stack)
-  turtleState = TurtleState(
+  turtleState = Turtle(
     position=pygame.Vector2(start_pos),
     rotation=start_rot - 180,
     turningAngle = angle,
@@ -165,7 +133,7 @@ def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, 
         if event.key == pygame.K_SPACE:
           # restart animation
           drawingSurface.fill((0,0,0,0))
-          turtleState = TurtleState(
+          turtleState = Turtle(
             position=pygame.Vector2(start_pos),
             rotation=start_rot - 180,
             turningAngle = angle,
