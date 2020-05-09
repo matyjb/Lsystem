@@ -144,7 +144,6 @@ def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, 
   )
   stack = []
 
-
   # index of what command was last executed in each frame
   lastOperationIndexFloat = 0
 
@@ -162,6 +161,24 @@ def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, 
           saveFile = "screenshots/"+timeTaken+".png"
           pygame.image.save(drawingSurface,saveFile)
           print("Screenshot saved as " + saveFile)
+
+        if event.key == pygame.K_SPACE:
+          # restart animation
+          drawingSurface.fill((0,0,0,0))
+          turtleState = TurtleState(
+            position=pygame.Vector2(start_pos),
+            rotation=start_rot - 180,
+            turningAngle = angle,
+            stepLength = steps,
+            color = (255,255,255),
+            width = widthOfLine
+          )
+          stack = []
+          lastOperationIndexFloat = len(cmdsTodo)
+      if event.type == pygame.KEYUP:
+        if event.key == pygame.K_SPACE:
+          lastOperationIndexFloat = 0
+
 
     ### CLEAR FRAME
     window.fill((0,0,0))
