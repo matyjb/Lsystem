@@ -28,7 +28,7 @@ defaultCommands = {
 keys = {}
 
 class TurtleWindow:
-  def __init__(self,defaultTurtleState=None,res=(800,800)):
+  def __init__(self,defaultTurtleState=None,maxRes=(800,800),minRes=(400,400)):
     turtleState=Turtle(pygame.Vector2(0,0),180,10,10,1,1,(255,255,255),1)
     if defaultTurtleState==None:
       self.turtle = copy.copy(turtleState)
@@ -36,7 +36,9 @@ class TurtleWindow:
       self.turtle = copy.copy(defaultTurtleState)
     self.defaultTurtleState = turtleState
 
-    self.window = pygame.display.set_mode(res)
+    self.window = None
+    self.maxRes = pygame.Vector2(maxRes)
+    self.minRes = pygame.Vector2(minRes)
     self.uiSurface = None
     self.drawingSurface = None
     self.stack = []
@@ -49,8 +51,13 @@ class TurtleWindow:
 
     self.camPos = pygame.Vector2(0,0)
 
-  def initUISurface(self,res=(800,800)):
-    self.uiSurface = pygame.display.set_mode(res, pygame.SRCALPHA)
+  def initWindow(self,res):
+    self.window = pygame.display.set_mode(res)
+
+  def initUISurface(self,res=None):
+    if res == None:
+      res = pygame.display.get_surface().get_size()
+    self.uiSurface = pygame.Surface(res, pygame.SRCALPHA)
     self.uiSurface.fill((0,0,0,0))
 
   def initDrawingSurface(self,res=(800,800)):
@@ -200,8 +207,6 @@ class TurtleWindow:
     
     cmdsTodo = translateStringToCmds(commands,outputString)
 
-    ## init pygame stuff
-    self.initUISurface()
     # calculate resolution for drawing based on cmdsTodo (progress turtle and check its position)
     self.pushState()
     maxX = minX = self.turtle.position.x
@@ -226,6 +231,19 @@ class TurtleWindow:
     bottomRight = pygame.Vector2(maxX,maxY)
 
     res = bottomRight - topLeft + DRAWING_SURFACE_MARGIN * 2
+    fullRes = res + DRAWING_SURFACE_OFFSET
+    if fullRes.x > self.maxRes.x:
+      fullRes.x = self.maxRes.x
+    if fullRes.y > self.maxRes.y:
+      fullRes.y = self.maxRes.y
+
+    if fullRes.x < self.minRes.x:
+      fullRes.x = self.minRes.x
+    if fullRes.y < self.minRes.y:
+      fullRes.y = self.minRes.y
+    ## init pygame stuff
+    self.initWindow((int(fullRes.x),int(fullRes.y)))
+    self.initUISurface()
     self.initDrawingSurface(res)
     self.turtle.position = self.turtle.position - topLeft + DRAWING_SURFACE_MARGIN
     clock = pygame.time.Clock()
