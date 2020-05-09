@@ -69,7 +69,7 @@ class TurtleWindow:
       self.turtle.moveForward(args)
       newPosition = self.turtle.position
       if shouldDraw:
-        pygame.draw.line(self.drawingSurface, (255,255,255), oldPosition, newPosition, self.turtle.width)
+        pygame.draw.line(self.drawingSurface, self.turtle.color, oldPosition, newPosition, self.turtle.width)
 
     elif cmd == CommandType.ROTATE_LEFT:
       self.turtle.rotateLeft(args)

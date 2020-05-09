@@ -1,0 +1,2 @@
+python L.py F-F-F-F -R F:FF-F--F-F -n 4 -a 90 -s 5 -t 1000 -d 1000
+python L.py F -R F:F-F+F+F-F -n 3 -t 2000 -a 90 -s 10 -d 1000
