@@ -32,7 +32,7 @@ def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, 
   if printString:
     print(outputString)
   ##
-  cmdsTodo = getCmdsTodo(commands,outputString)
+  cmdsTodo = translateStringToCmds(commands,outputString)
 
   ## init drawingSurface for fractal
   drawingSurface = pygame.Surface((800,800))

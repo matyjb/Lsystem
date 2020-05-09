@@ -22,7 +22,7 @@ def recursiveFindAndReplace(substring,rules,n):
 
   return ''.join(outputString)
 
-def getCmdsTodo(commands, string):
+def translateStringToCmds(commands, string):
   # pobrać substring od i do j=i+1
   # przefiltrować ckomendy tym substringiem
   # jesli przefiltrowane komendy beda puste wywal errora
