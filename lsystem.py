@@ -69,6 +69,7 @@ def getCmdsTodo(commands, string):
   # # jesli nie to j++ i wroc do pkt 2
   i = 0
   j = 1
+  result = []
   while i < len(string):
     possibleCmd = string[i:j]
     filteredCmds = filter_dict_by_prefix(commands,possibleCmd)
@@ -82,14 +83,16 @@ def getCmdsTodo(commands, string):
       # spr czy zostaly podane wiele komend jako jedna
       if isinstance(filteredCmds[possibleCmd], list):
         for c in filteredCmds[possibleCmd]:
-          yield c
+          result.append(c)
       else:
-        yield filteredCmds[possibleCmd]
+        result.append(filteredCmds[possibleCmd])
       
       i = j
       j += 1
     else:
       j += 1
+
+  return result
 
 defaultCommands = {
   "F": (CommandType.DRAW_FORWARD,None),
@@ -119,10 +122,18 @@ def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, 
   if printString:
     print(outputString)
   ##
-  cmdsTodo = [i for i in getCmdsTodo(commands,outputString)]
+  cmdsTodo = getCmdsTodo(commands,outputString)
+
+  ## init drawingSurface for fractal
+  drawingSurface = pygame.Surface((800,800))
+  drawingSurface.fill((0,0,0,0)) # full transparent bg
+
+  ## init pygame stuff
   clock = pygame.time.Clock()
   window = pygame.display.set_mode(res)
-  # init state (position, rotation, stack)
+  font = pygame.font.SysFont(pygame.font.get_default_font(), 20)
+
+  # init turtle state (position, rotation etc and stack)
   turtleState = TurtleState(
     position=pygame.Vector2(start_pos),
     rotation=start_rot - 180,
@@ -133,12 +144,13 @@ def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, 
   )
   stack = []
 
+
+  # index of what command was last executed in each frame
   lastOperationIndexFloat = 0
 
-  font = pygame.font.SysFont(pygame.font.get_default_font(), 24)
-
-  drawingSurface = window.copy()
+  ### MAIN LOOP
   while True:
+    ### EVENTS
     for event in pygame.event.get():
       if event.type == pygame.QUIT:
         return
@@ -151,20 +163,22 @@ def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, 
           pygame.image.save(drawingSurface,saveFile)
           print("Screenshot saved as " + saveFile)
 
+    ### CLEAR FRAME
+    window.fill((0,0,0))
 
-
-    # drawingSurface.fill((0,0,0))
+    ### TICKING
     dt = clock.tick()
     delay -= dt
-    # print(timeFromStartMs)
 
-    opsThisFrame = 0
+    opsThisFrame = 0 # how many operations should be executed this frame
     if delay <= 0:
+      # calculate how many operations should be executed this frame
       if timeToDrawAllMs == 0:
         opsThisFrame = len(cmdsTodo)
       else:
         opsThisFrame = float(len(cmdsTodo)) / timeToDrawAllMs * dt
 
+      ## EXECUTE COMMANDS in this frame
       for (cmd, arg) in cmdsTodo[int(lastOperationIndexFloat):int(lastOperationIndexFloat + opsThisFrame)]:
 
         if cmd == CommandType.MOVE_FORWARD:
@@ -179,7 +193,6 @@ def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, 
           newPosition = pygame.math.Vector2.rotate(pygame.Vector2(0,arg), turtleState.rotation) + turtleState.position
           pygame.draw.line(drawingSurface, (255,255,255), turtleState.position, newPosition, turtleState.width)
           turtleState.position = newPosition
-          # linesDrawn += 1
 
         elif cmd == CommandType.ROTATE_LEFT:
           if arg == None:
@@ -253,17 +266,22 @@ def show(rules, axiom, customCommands={}, steps=10, stepsMulFactor=1, angle=90, 
             turtleState.stepLength /= float(arg)
 
         else:
-          print("Nieznana komenda - " + str(cmd))
+          print("Unknown command: " + str(cmd))
 
     if lastOperationIndexFloat < len(cmdsTodo):
       lastOperationIndexFloat += opsThisFrame
     else:
       lastOperationIndexFloat = len(cmdsTodo)
 
+    # draw drawing surface on screen
     window.blit(drawingSurface, (0,0))
 
+    # generate progress text on screen
     opsOutOfAll = font.render(str(int(lastOperationIndexFloat))+" / "+str(len(cmdsTodo)), True, (255,255,255))
     window.blit(opsOutOfAll, (0, 0))
+
+    # draw turle on screen too?
     if drawTurtle:
       turtleState.draw(window)
+    
     pygame.display.flip()
