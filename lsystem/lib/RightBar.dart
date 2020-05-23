@@ -23,19 +23,20 @@ class _RightBarState extends State<RightBar> {
       decoration: BoxDecoration(
         border: Border(left: BorderSide(color: Colors.grey, width: 2)),
       ),
-      child: Column(
-        children: [
-          Center(
-            child: Container(
-              child: Text("Program",
-                  style: TextStyle(
-                      color: Colors.teal, fontWeight: FontWeight.bold)),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Center(
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: 2),
+                child: Text("Program",
+                    style: TextStyle(
+                        color: Colors.teal, fontWeight: FontWeight.bold)),
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              onChanged: (text){
+            TextField(
+              onChanged: (text) {
                 this.setState(() {
                   axiom = text;
                 });
@@ -45,12 +46,49 @@ class _RightBarState extends State<RightBar> {
                 labelText: 'Axiom',
               ),
             ),
-          ),
-          RaisedButton(
-            onPressed: () => this.widget.onExecute(this.axiom,<Rule>[], this.n, this.step, this.angle),
-            child: Text("Execute"),
-          )
-        ],
+            Slider(
+              value: this.n.toDouble(),
+              label: this.n.toString() + " times",
+              min: 0,
+              max: 10,
+              divisions: 10,
+              onChanged: (double value){
+                this.setState(() {
+                  n = value.toInt();
+                });
+              },
+            ),
+            Slider(
+              value: this.angle,
+              label: this.angle.toInt().toString() + " degrees",
+              min: -180,
+              max: 180,
+              divisions: 180,
+              onChanged: (double value){
+                this.setState(() {
+                  angle = value;
+                });
+              },
+            ),
+            Slider(
+              value: this.step,
+              label: this.step.toInt().toString() + " steps",
+              min: 0,
+              max: 150,
+              divisions: 150,
+              onChanged: (double value){
+                this.setState(() {
+                  step = value;
+                });
+              },
+            ),
+            RaisedButton(
+              onPressed: () => this.widget.onExecute(
+                  this.axiom, <Rule>[], this.n, this.step, this.angle),
+              child: Text("Execute"),
+            )
+          ],
+        ),
       ),
     );
   }
