@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lsystem/Line.dart';
 import 'package:lsystem/RightBar.dart';
+import 'package:lsystem/Rule.dart';
 import 'package:lsystem/TurtleCanvas.dart';
 
 void main() {
@@ -30,9 +31,9 @@ class TurtleManager extends StatefulWidget {
 }
 
 class _TurtleManagerState extends State<TurtleManager> {
-  // void onExecute(String axiom, List<Rule> rules){
-
-  // }
+  void onExecute(String axiom, List<Rule> rules){
+    print("hello" + axiom);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +46,7 @@ class _TurtleManagerState extends State<TurtleManager> {
             Expanded(
               child: Container(
                 width: 300,
-                child: RightBar(),
+                child: RightBar(onExecute: this.onExecute),
               ),
             )
           ],
