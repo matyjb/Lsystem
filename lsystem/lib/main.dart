@@ -61,7 +61,7 @@ class _TurtleManagerState extends State<TurtleManager> {
 
     for (int i = 0; i < s.length; i++) {
       switch (s[i]) {
-        case "F":
+        case "F": case "G":
           Offset oldPos = turtle.pos;
           turtle.moveForward();
           Offset newPos = turtle.pos;
