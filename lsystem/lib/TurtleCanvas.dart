@@ -10,7 +10,7 @@ class TurtleCanvas extends StatelessWidget {
   Widget build(BuildContext context) {
     return CustomPaint(
       painter: TurtlePainter(this.lines),
-      child: Expanded(child: Container()),
+      child: Column(),
     );
   }
 }

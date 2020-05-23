@@ -12,6 +12,9 @@ class RightBar extends StatefulWidget {
 
 class _RightBarState extends State<RightBar> {
   String axiom = "";
+  int n = 0;
+  double step = 10;
+  double angle = 90;
   List<Rule> rules = [];
 
   @override
@@ -44,7 +47,7 @@ class _RightBarState extends State<RightBar> {
             ),
           ),
           RaisedButton(
-            onPressed: () => this.widget.onExecute(this.axiom,[]),
+            onPressed: () => this.widget.onExecute(this.axiom,<Rule>[], this.n, this.step, this.angle),
             child: Text("Execute"),
           )
         ],
