@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:lsystem/Line.dart';
 
@@ -8,9 +7,11 @@ class TurtleCanvas extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: TurtlePainter(this.lines),
-      child: Column(),
+    return ClipRect(
+      child: CustomPaint(
+        painter: TurtlePainter(this.lines),
+        child: Column(),
+      ),
     );
   }
 }
@@ -24,10 +25,9 @@ class TurtlePainter extends CustomPainter {
     final paint = Paint()..color = Colors.red;
     final paint2 = Paint()..color = Colors.white;
     canvas.drawRect(
-        Rect.fromPoints(Offset(0, 0), Offset(size.width, size.height)),
-        paint);
+        Rect.fromPoints(Offset(0, 0), Offset(size.width, size.height)), paint);
     canvas.drawRect(
-        Rect.fromPoints(Offset(5, 5), Offset(size.width-5, size.height-5)),
+        Rect.fromPoints(Offset(5, 5), Offset(size.width - 5, size.height - 5)),
         paint2);
 
     for (var line in this.lines) {

@@ -15,6 +15,7 @@ class _RightBarState extends State<RightBar> {
   int n = 0;
   double step = 10;
   double angle = 90;
+
   List<Rule> rules = [];
 
   @override
@@ -46,13 +47,16 @@ class _RightBarState extends State<RightBar> {
                 labelText: 'Axiom',
               ),
             ),
+            RulesInputList(onRulesChange: (newRules) {
+              this.rules = newRules;
+            }),
             Slider(
               value: this.n.toDouble(),
               label: this.n.toString() + " times",
               min: 0,
               max: 10,
               divisions: 10,
-              onChanged: (double value){
+              onChanged: (double value) {
                 this.setState(() {
                   n = value.toInt();
                 });
@@ -64,7 +68,7 @@ class _RightBarState extends State<RightBar> {
               min: -180,
               max: 180,
               divisions: 180,
-              onChanged: (double value){
+              onChanged: (double value) {
                 this.setState(() {
                   angle = value;
                 });
@@ -76,20 +80,96 @@ class _RightBarState extends State<RightBar> {
               min: 0,
               max: 150,
               divisions: 150,
-              onChanged: (double value){
+              onChanged: (double value) {
                 this.setState(() {
                   step = value;
                 });
               },
             ),
             RaisedButton(
-              onPressed: () => this.widget.onExecute(
-                  this.axiom, <Rule>[], this.n, this.step, this.angle),
+              onPressed: () {
+                this.widget.onExecute(
+                    this.axiom, this.rules, this.n, this.step, this.angle);
+              },
               child: Text("Execute"),
             )
           ],
         ),
       ),
+    );
+  }
+}
+
+class RulesInputList extends StatefulWidget {
+  final Function onRulesChange;
+  RulesInputList({Key key, this.onRulesChange}) : super(key: key);
+
+  @override
+  _RulesInputListState createState() => _RulesInputListState();
+}
+
+class _RulesInputListState extends State<RulesInputList> {
+  List<Rule> rules = [];
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        for (Rule r in this.rules)
+          Row(
+            children: [
+              Flexible(
+                child: Container(
+                  width: 30,
+                  child: TextField(
+                    controller: TextEditingController()..text = r.what,
+                    onChanged: (text) {
+                      r.what = text;
+                      this.setState(() {});
+                      this.widget.onRulesChange(this.rules);
+                    },
+                  ),
+                ),
+              ),
+              Flexible(
+                child: Container(
+                  width: 250,
+                  child: TextField(
+                    controller: TextEditingController()..text = r.to,
+                    onChanged: (text) {
+                      r.to = text;
+                      this.setState(() {});
+                      this.widget.onRulesChange(this.rules);
+                    },
+                  ),
+                ),
+              ),
+              IconButton(
+                icon: Icon(Icons.remove),
+                color: Colors.red,
+                onPressed: () {
+                  rules.remove(r);
+                  this.setState(() {});
+                  this.widget.onRulesChange(this.rules);
+                },
+              ),
+            ],
+          ),
+        Row(
+          children: [
+            Expanded(
+              child: RaisedButton.icon(
+                onPressed: () {
+                  rules.add(Rule("", ""));
+                  this.setState(() {});
+                },
+                color: Colors.blue,
+                icon: Icon(Icons.add),
+                label: Text("Add rule"),
+              ),
+            ),
+          ],
+        )
+      ],
     );
   }
 }
