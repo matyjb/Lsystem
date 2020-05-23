@@ -1,16 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:lsystem/Line.dart';
 
-class TurtleCanvas extends StatelessWidget {
+class TurtleCanvas extends StatefulWidget {
   final List<Line> lines;
   TurtleCanvas({Key key, this.lines}) : super(key: key);
 
   @override
+  _TurtleCanvasState createState() => _TurtleCanvasState();
+}
+
+class _TurtleCanvasState extends State<TurtleCanvas> {
+  Offset offset = Offset(0, 0);
+  @override
   Widget build(BuildContext context) {
-    return ClipRect(
-      child: CustomPaint(
-        painter: TurtlePainter(this.lines),
-        child: Column(),
+    return GestureDetector(
+      onPanUpdate: (DragUpdateDetails details) {
+        this.setState(() {
+          offset += details.delta;
+        });
+      },
+      child: ClipRect(
+        child: CustomPaint(
+          painter: TurtlePainter(this.widget.lines,this.offset),
+          child: Column(),
+        ),
       ),
     );
   }
@@ -18,8 +31,9 @@ class TurtleCanvas extends StatelessWidget {
 
 class TurtlePainter extends CustomPainter {
   final List<Line> lines;
+  final Offset offset;
 
-  TurtlePainter(this.lines);
+  TurtlePainter(this.lines, this.offset);
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()..color = Colors.red;
@@ -32,12 +46,13 @@ class TurtlePainter extends CustomPainter {
 
     for (var line in this.lines) {
       Paint p = Paint()..color = line.color;
-      canvas.drawLine(line.p0, line.p1, p);
+      canvas.drawLine(line.p0 + offset, line.p1 + offset, p);
     }
   }
 
   @override
   bool shouldRepaint(TurtlePainter old) {
-    return false;
+    return old.offset != offset;
+    // return false;
   }
 }
