@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lsystem/Line.dart';
 import 'package:lsystem/RightBar.dart';
 import 'package:lsystem/Rule.dart';
 import 'package:lsystem/TurtleCanvas.dart';
@@ -30,7 +29,7 @@ class TurtleManager extends StatefulWidget {
 }
 
 class _TurtleManagerState extends State<TurtleManager> {
-  List<Line> linesDrawn = [];
+  List<Path> pathsDrawn = [];
 
   String recursiveFindAndReplace(String substring, List<Rule> rules, int n) {
     if (n <= 0) return substring;
@@ -55,9 +54,9 @@ class _TurtleManagerState extends State<TurtleManager> {
     return outputString.join();
   }
 
-  List<Line> getLines(String s, Turtle turtle) {
+  List<Path> getLines(String s, Turtle turtle) {
     List<Turtle> stack = [];
-    List<Line> result = [];
+    List<Path> paths = [Path()];
 
     for (int i = 0; i < s.length; i++) {
       switch (s[i]) {
@@ -65,10 +64,12 @@ class _TurtleManagerState extends State<TurtleManager> {
           Offset oldPos = turtle.pos;
           turtle.moveForward();
           Offset newPos = turtle.pos;
-          result.add(Line(oldPos, newPos));
+          paths.last.moveTo(oldPos.dx, oldPos.dy);
+          paths.last.lineTo(newPos.dx, newPos.dy);
           break;
         case "f":
           turtle.moveForward();
+          paths.add(Path());
           break;
         case "+":
           turtle.rotateLeft();
@@ -81,12 +82,14 @@ class _TurtleManagerState extends State<TurtleManager> {
           break;
         case "]":
           turtle = stack.removeLast();
+          paths.add(Path());
           break;
         default:
           break;
       }
     }
-    return result;
+    // return result;
+    return paths;
   }
 
   void onExecute(String axiom, List<Rule> rules, int n, double stepSize, double turningAngle) {
@@ -98,9 +101,11 @@ class _TurtleManagerState extends State<TurtleManager> {
     Turtle turtle = Turtle();
     turtle.stepSize = stepSize;
     turtle.turningAngle = turningAngle;
-    List<Line> lines = getLines(s, turtle);
+    // List<Line> lines = getLines(s, turtle);
+    List<Path> paths = getLines(s, turtle);
     this.setState(() {
-      linesDrawn = lines;
+      // linesDrawn = lines;
+      pathsDrawn = paths;
     });
   }
 
@@ -109,7 +114,7 @@ class _TurtleManagerState extends State<TurtleManager> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Expanded(child: TurtleCanvas(lines: linesDrawn)),
+        Expanded(child: TurtleCanvas(paths: pathsDrawn)),
         Column(
           children: [
             Expanded(

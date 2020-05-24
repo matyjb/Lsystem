@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:lsystem/Line.dart';
 
 class TurtleCanvas extends StatefulWidget {
-  final List<Line> lines;
-  TurtleCanvas({Key key, this.lines}) : super(key: key);
+  final List<Path> paths;
+  TurtleCanvas({Key key, this.paths}) : super(key: key);
 
   @override
   _TurtleCanvasState createState() => _TurtleCanvasState();
@@ -21,7 +20,7 @@ class _TurtleCanvasState extends State<TurtleCanvas> {
       },
       child: ClipRect(
         child: CustomPaint(
-          painter: TurtlePainter(this.widget.lines,this.offset),
+          painter: TurtlePainter(this.widget.paths,this.offset),
           child: Column(),
         ),
       ),
@@ -30,29 +29,24 @@ class _TurtleCanvasState extends State<TurtleCanvas> {
 }
 
 class TurtlePainter extends CustomPainter {
-  final List<Line> lines;
+  final List<Path> paths;
   final Offset offset;
 
-  TurtlePainter(this.lines, this.offset);
+  TurtlePainter(this.paths, this.offset);
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = Colors.red;
-    final paint2 = Paint()..color = Colors.white;
-    canvas.drawRect(
-        Rect.fromPoints(Offset(0, 0), Offset(size.width, size.height)), paint);
-    canvas.drawRect(
-        Rect.fromPoints(Offset(5, 5), Offset(size.width - 5, size.height - 5)),
-        paint2);
-
-    for (var line in this.lines) {
-      Paint p = Paint()..color = line.color;
-      canvas.drawLine(line.p0 + offset, line.p1 + offset, p);
+    for (var path in this.paths) {
+      // Paint p = Paint()..color = line.color;
+      Paint p = Paint()
+        ..color = Colors.black
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2;
+      canvas.drawPath(path.shift(offset), p);
     }
   }
 
   @override
   bool shouldRepaint(TurtlePainter old) {
     return old.offset != offset;
-    // return false;
   }
 }
