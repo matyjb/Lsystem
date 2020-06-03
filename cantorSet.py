@@ -13,6 +13,6 @@ rules = {
 t.show(
   axiom,
   rules,
-  n=6,
+  n=7,
   timeToDrawAllMs=1000
   )

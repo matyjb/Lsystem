@@ -1,57 +1,44 @@
+import re
+
 def filter_dict_by_prefix(d, filter_prefix):
     return {key:val for key, val in d.items() if key.startswith(filter_prefix)}
 
+# splituje txt podanymi separatoramia (jako krotka albo lista) i pozostawia separatory
+# np. split("abfdcd",("a","c")) => ["a","bfd","c","d"]
+def split(txt, separators):
+  result = re.split("("+separators[0]+")",txt)
+  for ss in separators[1:]:
+    tmp = []
+    for e in result:
+      tmp += re.split("("+ss+")",e)
+    result = tmp
+  return result
 
 def recursiveFindAndReplace(substring,rules,n):
   if n <= 0:
     return substring
 
-  outputString = []
-  i=0
-  while i < len(substring):
-    didApplyRule = False
-    for (key, val) in rules.items():
-      if substring[i:].startswith(key):
-        i += len(key)
-        didApplyRule = True
-        outputString.append(recursiveFindAndReplace(val,rules,n-1))
-      
-    if not didApplyRule:
-      outputString.append(substring[i])
-      i += 1
-
-  return ''.join(outputString)
+  splitSubstring = split(substring,list(rules.keys()))
+  #replace
+  result = [rules[e] if e in rules.keys() else e for e in splitSubstring]
+  return recursiveFindAndReplace(''.join(result),rules,n-1)
 
 def translateStringToCmds(commands, string):
-  # pobrać substring od i do j=i+1
-  # przefiltrować ckomendy tym substringiem
-  # jesli przefiltrowane komendy beda puste wywal errora
-  # jesli nie beda sprawdz czy zawiera klucz == substringowi
-  # # jesli tak to dodaj komende, i=j i wroc do pkt 2
-  # # jesli nie to j++ i wroc do pkt 2
-  i = 0
-  j = 1
   result = []
-  while i < len(string):
-    possibleCmd = string[i:j]
-    filteredCmds = filter_dict_by_prefix(commands,possibleCmd)
-    if len(filteredCmds) == 0:
-      # print("niezrozumiała komenda: " + possibleCmd)
-      i = j
-      j += 1
-      continue
+  queue = string
+  while len(queue):
+    didTranslate = False
+    for (key, value) in commands.items():
+      if queue.startswith(key):
+        if isinstance(value, list):
+          for c in value:
+            result.append(c)
+        else:
+          result.append(value)
+        queue = queue[len(key):]
+        didTranslate = True
+        break
+    if not didTranslate:
+      queue = queue[1:]
     
-    if possibleCmd in filteredCmds.keys():
-      # spr czy zostaly podane wiele komend jako jedna
-      if isinstance(filteredCmds[possibleCmd], list):
-        for c in filteredCmds[possibleCmd]:
-          result.append(c)
-      else:
-        result.append(filteredCmds[possibleCmd])
-      
-      i = j
-      j += 1
-    else:
-      j += 1
-
   return result
