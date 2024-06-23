@@ -1,18 +1,17 @@
-from TurtleWindow import TurtleWindow
-from CommandType import CommandType
+from app.TurtleWindow import TurtleWindow
 
 t = TurtleWindow()
-t.turtle.stepLength=2
-t.turtle.turningAngle=25
+t.turtle.stepLength = 2
+t.turtle.turningAngle = 25
 
 axiom = "X"
 rules = {
-  "X":"F+[[X]-X]-F[-FX]+X", 
-  "F":"FF"
+    "X": "F+[[X]-X]-F[-FX]+X",
+    "F": "FF",
 }
 t.show(
-  axiom,
-  rules,
-  n=7,
-  timeToDrawAllMs=50000
-  )
+    axiom,
+    rules,
+    n=7,
+    timeToDrawAllMs=50000,
+)

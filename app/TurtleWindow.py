@@ -1,7 +1,7 @@
-import sys, copy, time, os, pygame
-from CommandType import CommandType
-from Turtle import Turtle
-from helperFunctions import *
+import copy, time, os, pygame
+from app.CommandType import *
+from app.Turtle import *
+from app.helperFunctions import *
 pygame.init()
 
 DRAWING_SURFACE_MARGIN = pygame.Vector2(5,5)
@@ -117,10 +117,7 @@ class TurtleWindow:
 
     elif cmd == CommandType.DRAW_DOT:
       if shouldDraw:
-        if args == None:
-          pygame.draw.circle(self.drawingSurface, self.turtle.color, self.turtle.position, self.turtle.width)
-        else:
-          pygame.draw.circle(self.drawingSurface, self.turtle.color, self.turtle.position, arg)
+        pygame.draw.circle(self.drawingSurface, self.turtle.color, self.turtle.position, self.turtle.width if args is None else args)
 
     elif cmd == CommandType.INC_ANGLE:
       if args == None:

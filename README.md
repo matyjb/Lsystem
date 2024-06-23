@@ -1,5 +1,21 @@
 # Lsystem
 --------------------
+
+## How to run
+Install requirements:
+```
+pip install -r ./app/requirements.txt
+```
+You can run any of the examples provided to see how it works
+```
+python crystal.py
+```
+or run them all sequentionally with
+```
+python testAllExamples.py
+```
+
+
 ## Posible commands
 
 - push position and rotation on stack
@@ -23,7 +39,7 @@
 'f' - move forward by step size\
 '+' - rotate right by angle\
 '-' - rotate left by angle\
-'[' - push turlte state\
+'[' - push turtle state\
 ']' - pop turtle state\
 '#' - increment line width\
 '!' - decrement line width (line width >= 1)\
