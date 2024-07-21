@@ -1,6 +1,9 @@
 # Lsystem
 --------------------
 
+![](example_anims/crystal.gif)
+![](example_anims/fractalPlant.gif)
+
 ## How to run
 Install requirements:
 ```
